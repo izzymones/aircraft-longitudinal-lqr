@@ -2,8 +2,8 @@ import numpy as np
 import casadi as ca
 
 class AircraftModel:
-    def __init__(self, mc):
-        self.mc = mc
+    def __init__(self, parameters):
+        self.p = parameters
 
         u = ca.SX.sym('u', 1, 1)
         w = ca.SX.sym('w', 1, 1)
@@ -15,22 +15,22 @@ class AircraftModel:
         de = ca.SX.sym('de', 1, 1)
         u_in = ca.vertcat(de)
 
-        du = u - mc.u0
-        dw = w - mc.w0
-        dq = q - mc.q0
-        dde = de - mc.de0
+        du = u - self.p.xr[0]
+        dw = w - self.p.xr[1]
+        dq = q - self.p.xr[2]
+        dde = de - self.p.ur
 
-        Mu_tilde = mc.Mu + mc.Mwdot * mc.Zu
-        Mw_tilde = mc.Mw + mc.Mwdot * mc.Zw
-        Mq_tilde = mc.Mq + mc.Mwdot * mc.u0
-        Mde_tilde = mc.Mde + mc.Mwdot * mc.Zde
+        Mu_tilde = self.p.Mu + self.p.Mwdot * self.p.Zu
+        Mw_tilde = self.p.Mw + self.p.Mwdot * self.p.Zw
+        Mq_tilde = self.p.Mq + self.p.Mwdot * self.p.ur
+        Mde_tilde = self.p.Mde + self.p.Mwdot * self.p.Zde
 
-        X = mc.Xu * du + mc.Xw * dw + mc.Xde * dde
-        Z = mc.Zu * du + mc.Zw * dw + mc.Zde * dde
-        M = Mu_tilde * du + Mw_tilde * dw + Mq_tilde * dq + Mde_tilde * dde
+        X = self.p.X0 + (self.p.Xu*du + self.p.Xw*dw + self.p.Xde*dde)
+        Z = self.p.Z0 + (self.p.Zu*du + self.p.Zw*dw + self.p.Zde*dde)
+        M = self.p.M0 + (Mu_tilde*du + Mw_tilde*dw + Mq_tilde*dq + Mde_tilde*dde)
 
-        u_dot = X - mc.g * ca.sin(theta) - q * w
-        w_dot = Z + mc.g * ca.cos(theta) + q * u
+        u_dot = X - self.p.g * ca.sin(theta) - q * w
+        w_dot = Z + self.p.g * ca.cos(theta) + q * u
         q_dot = M
         theta_dot = q
 
@@ -41,15 +41,3 @@ class AircraftModel:
         self.dynamics = x_dot
 
         self.f = ca.Function('f', [x, u_in], [x_dot], ['x', 'u'], ['x_dot'])
-
-
-if __name__ == "__main__":
-
-
-    mc = MC()
-    model = LongitudinalModel(mc)
-
-    xr = np.array([mc.u0, mc.w0, mc.q0, mc.theta0], dtype=float)
-    ur = np.array([mc.de0], dtype=float)
-
-    print_AB(model, xr, ur)

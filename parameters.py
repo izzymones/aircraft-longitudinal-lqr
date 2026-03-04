@@ -9,11 +9,9 @@ class Parameters:
 
         self.g = 32.2
 
-        self.u0 = 202.56
-        self.w0 = 0.0
-        self.q0 = 0.0
-        self.theta0 = 0.0
-        self.de0 = 0.0
+        self.X0 = 0.0
+        self.Z0 = -self.g
+        self.M0 = 0.0
 
         self.Xu = -0.22
         self.Xw = 0.060
@@ -28,11 +26,13 @@ class Parameters:
         self.Zde = 4.58
         self.Mde = 1.195
 
-        self.xr = np.array([self.u0, self.w0, self.q0, self.theta0], dtype=float).reshape((4,1))
-        self.ur = np.array([self.de0], dtype=float).reshape((1,1))
+        self.x0 = np.array([190.0, 20.0, 1.0, 1.0], dtype=float).reshape((4,1))
+        self.u0 = np.array([0.0], dtype=float).reshape((1,1))
+        self.xr = np.array([202.56, 0.0, 0.0, 0.0], dtype=float).reshape((4,1))
+        self.ur = np.array([0.0], dtype=float).reshape((1,1))
 
-        self.Q = ca.diag([1.0, 1.0, 1.0, 1.0])
-        self.R = ca.diag([1.0])
+        self.Q = ca.diag([1/10**2, 1/5**2, 1/0.2**2, 1/0.087**2])
+        self.R = ca.diag([1/0.175**2])
 
 
         self.de_max = np.deg2rad(25.0)
