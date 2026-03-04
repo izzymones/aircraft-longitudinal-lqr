@@ -1,29 +1,24 @@
+import numpy as np
 import casadi as ca
 
-class LongitudinalModel:
+class AircraftModel:
     def __init__(self, mc):
         self.mc = mc
 
-        u = ca.SX.sym('u')
-        w = ca.SX.sym('w')
-        q = ca.SX.sym('q')
-        theta = ca.SX.sym('theta')
+        u = ca.SX.sym('u', 1, 1)
+        w = ca.SX.sym('w', 1, 1)
+        q = ca.SX.sym('q', 1, 1)
+        theta = ca.SX.sym('theta', 1, 1)
 
         x = ca.vertcat(u, w, q, theta)
 
-        de = ca.SX.sym('de')
+        de = ca.SX.sym('de', 1, 1)
         u_in = ca.vertcat(de)
 
-        u0 = mc.u0
-        w0 = mc.w0 if hasattr(mc, 'w0') else 0.0
-        q0 = mc.q0 if hasattr(mc, 'q0') else 0.0
-        theta0 = mc.theta0 if hasattr(mc, 'theta0') else 0.0
-        de0 = mc.de0 if hasattr(mc, 'de0') else 0.0
-
-        du = u - u0
-        dw = w - w0
-        dq = q - q0
-        dde = de - de0
+        du = u - mc.u0
+        dw = w - mc.w0
+        dq = q - mc.q0
+        dde = de - mc.de0
 
         Mu_tilde = mc.Mu + mc.Mwdot * mc.Zu
         Mw_tilde = mc.Mw + mc.Mwdot * mc.Zw
@@ -46,3 +41,15 @@ class LongitudinalModel:
         self.dynamics = x_dot
 
         self.f = ca.Function('f', [x, u_in], [x_dot], ['x', 'u'], ['x_dot'])
+
+
+if __name__ == "__main__":
+
+
+    mc = MC()
+    model = LongitudinalModel(mc)
+
+    xr = np.array([mc.u0, mc.w0, mc.q0, mc.theta0], dtype=float)
+    ur = np.array([mc.de0], dtype=float)
+
+    print_AB(model, xr, ur)
