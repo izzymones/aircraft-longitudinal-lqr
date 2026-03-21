@@ -9,7 +9,7 @@ class AircraftPlotter():
     def plot_state(self, key: str, title='State'):
         x = self.data[key]
         num_iterations = len(x)
-        tspan = np.arange(0, num_iterations * self.fcs.p.dt, self.fcs.p.dt)
+        tspan = self.fcs.p.dt * np.arange(num_iterations)
 
         fig, axs = plt.subplots(4)
         fig.set_figheight(8)
@@ -32,8 +32,7 @@ class AircraftPlotter():
     def plot_control(self, key: str, title='Control'):
         u = self.data[key]
         num_iterations = len(u)
-        tspan = np.arange(0, num_iterations * self.fcs.p.dt, self.fcs.p.dt)
-
+        tspan = self.fcs.p.dt * np.arange(num_iterations)
         fig, ax = plt.subplots(1)
         fig.set_figheight(4)
         fig.suptitle(title)

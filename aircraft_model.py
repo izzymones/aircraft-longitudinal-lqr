@@ -22,7 +22,7 @@ class AircraftModel:
 
         Mu_tilde = self.p.Mu + self.p.Mwdot * self.p.Zu
         Mw_tilde = self.p.Mw + self.p.Mwdot * self.p.Zw
-        Mq_tilde = self.p.Mq + self.p.Mwdot * self.p.ur
+        Mq_tilde = self.p.Mq + self.p.Mwdot * self.p.x0[0]
         Mde_tilde = self.p.Mde + self.p.Mwdot * self.p.Zde
 
         X = self.p.X0 + (self.p.Xu*du + self.p.Xw*dw + self.p.Xde*dde)
